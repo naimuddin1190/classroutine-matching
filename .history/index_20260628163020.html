@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCSE Class Routine — Spring 2026</title>
+<style>
+  :root{
+    --ink:#1b1f23;
+    --paper:#faf7f0;
+    --line:#d9d2c2;
+    --accent:#a3392c;
+    --accent-soft:#f1e3d6;
+    --muted:#6b6256;
+    --mono: "JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height:1.45;
+  }
+  header{
+    border-bottom:2px solid var(--ink);
+    padding:28px 24px 18px;
+    text-align:center;
+  }
+  header h1{
+    margin:0;
+    font-size:1.9rem;
+    letter-spacing:0.5px;
+  }
+  header p{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+  }
+  .controls{
+    max-width:920px;
+    margin:24px auto 0;
+    padding:0 20px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .field label{
+    font-family:var(--mono);
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--muted);
+  }
+  select{
+    font-family: Georgia, serif;
+    font-size:1rem;
+    padding:8px 10px;
+    border:1.5px solid var(--ink);
+    background:#fff;
+    color:var(--ink);
+    border-radius:2px;
+    min-width:140px;
+  }
+  .container{
+    max-width:920px;
+    margin:0 auto;
+    padding:26px 20px 80px;
+  }
+  .day-block{
+    margin-bottom:30px;
+  }
+  .day-title{
+    font-family:var(--mono);
+    font-size:0.95rem;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    margin-bottom:12px;
+    color:var(--accent);
+  }
+  .no-class{
+    color:var(--muted);
+    font-style:italic;
+    font-size:0.95rem;
+    padding:6px 0;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  td, th{
+    text-align:left;
+    padding:9px 8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  th{
+    font-family:var(--mono);
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--muted);
+    border-bottom:1.5px solid var(--ink);
+  }
+  .period-cell{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--accent);
+    white-space:nowrap;
+    width:170px;
+  }
+  .course-line{
+    margin:2px 0;
+  }
+  .course-name{
+    font-weight:bold;
+  }
+  .teacher{
+    color:var(--muted);
+  }
+  .room{
+    font-family:var(--mono);
+    font-size:0.85rem;
+  }
+  footer{
+    text-align:center;
+    padding:18px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:0.7rem;
+    border-top:1px solid var(--line);
+  }
+  .note{
+    max-width:920px;
+    margin:18px auto 0;
+    padding:0 20px;
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--muted);
+  }
+  .tabs{
+    max-width:920px;
+    margin:26px auto 0;
+    padding:0 20px;
+    display:flex;
+    gap:0;
+    border-bottom:2px solid var(--ink);
+  }
+  .tab-btn{
+    font-family:var(--mono);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:0.78rem;
+    background:none;
+    border:none;
+    padding:10px 16px;
+    cursor:pointer;
+    color:var(--muted);
+    border-bottom:3px solid transparent;
+    margin-bottom:-2px;
+  }
+  .tab-btn.active{
+    color:var(--accent);
+    border-bottom:3px solid var(--accent);
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  .search-box{
+    max-width:920px;
+    margin:20px auto 0;
+    padding:0 20px;
+  }
+  .search-box input{
+    width:100%;
+    font-family:Georgia, serif;
+    font-size:1rem;
+    padding:10px 12px;
+    border:1.5px solid var(--ink);
+    border-radius:2px;
+    background:#fff;
+  }
+  .search-results{
+    margin-top:14px;
+  }
+  .result-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .result-info{flex:1; min-width:220px;}
+  .result-tag{
+    font-family:var(--mono);
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:2px 7px;
+    border-radius:10px;
+    margin-right:8px;
+  }
+  .result-day{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--muted);
+  }
+  .add-btn{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:7px 12px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .add-btn:disabled{
+    background:var(--line);
+    color:var(--muted);
+    cursor:default;
+  }
+  .add-btn.remove{
+    background:var(--accent);
+  }
+  .my-list-empty{
+    color:var(--muted);
+    font-style:italic;
+    padding:20px 0;
+  }
+  .clash-banner{
+    background:#fbe4e1;
+    border:1.5px solid var(--accent);
+    color:var(--accent);
+    font-family:var(--mono);
+    font-size:0.78rem;
+    padding:10px 12px;
+    margin-bottom:16px;
+    border-radius:3px;
+  }
+  .my-card{
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .my-card.clash{
+    border-color:var(--accent);
+    background:#fff7f5;
+  }
+  @media (max-width:600px){
+    .period-cell{width:auto;}
+    table, thead, tbody, th, td, tr{display:block;}
+    th{display:none;}
+    tr{margin-bottom:10px; border-bottom:1px solid var(--line); padding-bottom:6px;}
+    td{border-bottom:none; padding:3px 0;}
+    .period-cell{color:var(--accent); font-weight:bold;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Premier University — DCSE</h1>
+  <p>Class Schedule · Session: Spring 2026 · Update: 26.06.2026</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="browse">Browse by Section</button>
+  <button class="tab-btn" data-tab="search">Search Courses</button>
+  <button class="tab-btn" data-tab="mine">My Combined Routine <span id="mineCount"></span></button>
+</div>
+
+<!-- BROWSE VIEW -->
+<div class="view active" id="view-browse">
+  <div class="controls">
+    <div class="field">
+      <label for="sem">Semester</label>
+      <select id="sem"></select>
+    </div>
+    <div class="field">
+      <label for="sec">Section</label>
+      <select id="sec"></select>
+    </div>
+  </div>
+
+  <div class="container" id="container"></div>
+
+  <div class="note">
+    Time bands are grouped into Morning (8:30–11:00), Midday (11:00–1:30), Afternoon (1:30–4:00) and
+    Evening (5:30–6:00) for readability. For exact minute-level slot boundaries, refer to the original PDF.
+  </div>
+</div>
+
+<!-- SEARCH VIEW -->
+<div class="view" id="view-search">
+  <div class="search-box">
+    <input type="text" id="courseSearch" placeholder="Search by course name, teacher, room, or section (e.g. ALGO, FJD, 4A, 902)...">
+  </div>
+  <div class="container">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="note">
+    Tip: this searches across every semester, section and day. Add any matching class to "My Combined Routine"
+    to check it against your existing classes — useful for retake / recourse planning.
+  </div>
+</div>
+
+<!-- MY COMBINED ROUTINE VIEW -->
+<div class="view" id="view-mine">
+  <div class="container" id="mineContainer"></div>
+</div>
+
+<footer>Department of Computer Science and Engineering (DCSE) · Premier University</footer>
+
+<script src="data.js"></script>
+<script>
+const semSelect = document.getElementById('sem');
+const secSelect = document.getElementById('sec');
+const container = document.getElementById('container');
+
+// build semester -> sections map from data
+function getSemSections(){
+  const map = {};
+  DAYS.forEach(day=>{
+    Object.keys(ROUTINE[day]).forEach(code=>{
+      const sem = code[0];
+      const sec = code.slice(1);
+      if(!map[sem]) map[sem] = new Set();
+      map[sem].add(sec);
+    });
+  });
+  return map;
+}
+
+const semMap = getSemSections();
+const sems = Object.keys(semMap).sort();
+
+sems.forEach(sem=>{
+  const opt = document.createElement('option');
+  opt.value = sem;
+  opt.textContent = 'Semester ' + sem;
+  semSelect.appendChild(opt);
+});
+
+function populateSections(sem){
+  secSelect.innerHTML = '';
+  const secs = Array.from(semMap[sem]).sort();
+  secs.forEach(sec=>{
+    const opt = document.createElement('option');
+    opt.value = sec;
+    opt.textContent = 'Section ' + sec;
+    secSelect.appendChild(opt);
+  });
+}
+
+function parseEntry(text){
+  // format Course/Teacher/Room
+  const parts = text.split('/');
+  if(parts.length >= 3){
+    const room = parts.pop();
+    const teacher = parts.pop();
+    const course = parts.join('/');
+    return {course, teacher, room};
+  }
+  return {course: text, teacher:'', room:''};
+}
+
+function render(){
+  const sem = semSelect.value;
+  const sec = secSelect.value;
+  const code = sem + sec;
+  container.innerHTML = '';
+
+  DAYS.forEach(day=>{
+    const entries = ROUTINE[day][code];
+    const block = document.createElement('div');
+    block.className = 'day-block';
+
+    const title = document.createElement('div');
+    title.className = 'day-title';
+    title.textContent = day;
+    block.appendChild(title);
+
+    if(!entries || entries.length === 0){
+      const p = document.createElement('div');
+      p.className = 'no-class';
+      p.textContent = 'No class scheduled.';
+      block.appendChild(p);
+    } else {
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = '<tr><th>Time</th><th>Course</th></tr>';
+      table.appendChild(thead);
+      const tbody = document.createElement('tbody');
+
+      entries.forEach(([period, text])=>{
+        const tr = document.createElement('tr');
+        const tdTime = document.createElement('td');
+        tdTime.className = 'period-cell';
+        tdTime.textContent = PERIODS[period];
+        const tdCourse = document.createElement('td');
+        const {course, teacher, room} = parseEntry(text);
+        tdCourse.innerHTML =
+          '<div class="course-line"><span class="course-name">'+course+'</span></div>' +
+          (teacher ? '<div class="course-line teacher">'+teacher+'</div>' : '') +
+          (room ? '<div class="course-line room">Room '+room+'</div>' : '');
+        tr.appendChild(tdTime);
+        tr.appendChild(tdCourse);
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      block.appendChild(table);
+    }
+
+    container.appendChild(block);
+  });
+}
+
+semSelect.addEventListener('change', ()=>{
+  populateSections(semSelect.value);
+  render();
+});
+secSelect.addEventListener('change', render);
+
+// init
+populateSections(sems[0]);
+render();
+
+/* ===================== TABS ===================== */
+const tabBtns = document.querySelectorAll('.tab-btn');
+const views = {
+  browse: document.getElementById('view-browse'),
+  search: document.getElementById('view-search'),
+  mine: document.getElementById('view-mine')
+};
+tabBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    Object.values(views).forEach(v=>v.classList.remove('active'));
+    views[btn.dataset.tab].classList.add('active');
+    if(btn.dataset.tab === 'mine') renderMine();
+  });
+});
+
+/* ===================== FLATTEN ALL CLASSES FOR SEARCH ===================== */
+// Each item: {day, sem, sec, code, period, raw, course, teacher, room}
+const ALL_CLASSES = [];
+DAYS.forEach(day=>{
+  Object.keys(ROUTINE[day]).forEach(code=>{
+    const sem = code[0];
+    const sec = code.slice(1);
+    ROUTINE[day][code].forEach(([period, text], idx)=>{
+      const {course, teacher, room} = parseEntry(text);
+      ALL_CLASSES.push({
+        id: day+'|'+code+'|'+idx,
+        day, sem, sec, code, period, raw:text, course, teacher, room
+      });
+    });
+  });
+});
+
+/* ===================== SEARCH ===================== */
+const courseSearchInput = document.getElementById('courseSearch');
+const searchResults = document.getElementById('searchResults');
+
+// My selected classes (in-memory, persists while page is open)
+const myClasses = []; // array of ALL_CLASSES item ids
+const mineCountSpan = document.getElementById('mineCount');
+
+function updateMineCount(){
+  mineCountSpan.textContent = myClasses.length ? '(' + myClasses.length + ')' : '';
+}
+
+function isAdded(id){
+  return myClasses.includes(id);
+}
+
+function toggleAdd(id){
+  const idx = myClasses.indexOf(id);
+  if(idx === -1) myClasses.push(id);
+  else myClasses.splice(idx,1);
+  updateMineCount();
+  renderSearch();
+  if(views.mine.classList.contains('active')) renderMine();
+}
+
+function toggleAddGroup(ids){
+  const allAdded = ids.every(id => isAdded(id));
+  if(allAdded){
+    ids.forEach(id=>{
+      const idx = myClasses.indexOf(id);
+      if(idx !== -1) myClasses.splice(idx,1);
+    });
+  } else {
+    ids.forEach(id=>{
+      if(!isAdded(id)) myClasses.push(id);
+    });
+  }
+  updateMineCount();
+  renderSearch();
+  if(views.mine.classList.contains('active')) renderMine();
+}
+
+function groupKey(item){
+  return item.sem + '|' + item.sec + '|' + item.course + '|' + item.teacher;
+}
+
+function groupClasses(list){
+  const groups = {};
+  list.forEach(item=>{
+    const key = groupKey(item);
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(item);
+  });
+  // order each group's occurrences by DAYS order
+  Object.values(groups).forEach(arr=>{
+    arr.sort((a,b)=> DAYS.indexOf(a.day) - DAYS.indexOf(b.day));
+  });
+  return groups;
+}
+
+function renderSearch(){
+  const q = courseSearchInput.value.trim().toUpperCase();
+  searchResults.innerHTML = '';
+
+  if(!q){
+    searchResults.innerHTML = '<div class="my-list-empty">Start typing a course code, teacher initials, room number, or section (e.g. "4A", "ALGO", "FJD") to search.</div>';
+    return;
+  }
+
+  const matches = ALL_CLASSES.filter(item=>{
+    const haystack = (item.course+' '+item.teacher+' '+item.room+' '+item.code+' '+item.sem+' '+item.sec+' '+item.day).toUpperCase();
+    return haystack.includes(q);
+  });
+
+  if(matches.length === 0){
+    searchResults.innerHTML = '<div class="my-list-empty">No matching classes found.</div>';
+    return;
+  }
+
+  const groups = groupClasses(matches);
+
+  Object.values(groups).forEach(occurrences=>{
+    const first = occurrences[0];
+    const row = document.createElement('div');
+    row.className = 'result-row';
+
+    const scheduleLines = occurrences.map(o => o.day + ' ' + PERIODS[o.period] + (o.room ? ' (Room ' + o.room + ')' : '')).join(' · ');
+
+    const info = document.createElement('div');
+    info.className = 'result-info';
+    info.innerHTML =
+      '<span class="result-tag">Sem ' + first.sem + ' · Sec ' + first.sec + '</span>' +
+      '<span class="course-name">' + first.course + '</span> ' +
+      (first.teacher ? '<span class="teacher">— ' + first.teacher + '</span>' : '') +
+      '<div class="result-day">' + scheduleLines + (occurrences.length > 1 ? ' <em>(' + occurrences.length + 'x/week)</em>' : '') + '</div>';
+
+    const groupIds = occurrences.map(o=>o.id);
+    const allAdded = groupIds.every(id => isAdded(id));
+
+    const btn = document.createElement('button');
+    btn.className = 'add-btn' + (allAdded ? ' remove' : '');
+    btn.textContent = allAdded
+      ? (occurrences.length > 1 ? 'Remove both' : 'Remove')
+      : (occurrences.length > 1 ? 'Add both to my routine' : 'Add to my routine');
+    btn.addEventListener('click', ()=> toggleAddGroup(groupIds));
+
+    row.appendChild(info);
+    row.appendChild(btn);
+    searchResults.appendChild(row);
+  });
+}
+
+courseSearchInput.addEventListener('input', renderSearch);
+renderSearch();
+
+/* ===================== MY COMBINED ROUTINE ===================== */
+function renderMine(){
+  const mineContainer = document.getElementById('mineContainer');
+  mineContainer.innerHTML = '';
+
+  if(myClasses.length === 0){
+    mineContainer.innerHTML = '<div class="my-list-empty">No classes added yet. Go to "Search Courses" and add classes you want to compare — for example, when checking a retake/recourse against your current section\'s routine.</div>';
+    return;
+  }
+
+  const items = myClasses.map(id => ALL_CLASSES.find(c=>c.id===id));
+
+  // detect clashes: same day + same period across different items
+  const clashKeySet = {};
+  items.forEach(item=>{
+    const key = item.day + '|' + item.period;
+    clashKeySet[key] = (clashKeySet[key] || 0) + 1;
+  });
+  const clashingIds = items.filter(item => clashKeySet[item.day+'|'+item.period] > 1).map(i=>i.id);
+
+  if(clashingIds.length > 0){
+    const banner = document.createElement('div');
+    banner.className = 'clash-banner';
+    banner.textContent = '⚠ Time conflict detected — ' + clashingIds.length + ' class(es) below overlap on the same day and time band.';
+    mineContainer.appendChild(banner);
+  }
+
+  // group by day for display, in DAYS order
+  DAYS.forEach(day=>{
+    const dayItems = items.filter(i=>i.day===day).sort((a,b)=> Object.keys(PERIODS).indexOf(a.period) - Object.keys(PERIODS).indexOf(b.period));
+    if(dayItems.length === 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'day-block';
+    const title = document.createElement('div');
+    title.className = 'day-title';
+    title.textContent = day;
+    block.appendChild(title);
+
+    dayItems.forEach(item=>{
+      const clash = clashingIds.includes(item.id);
+      const card = document.createElement('div');
+      card.className = 'my-card' + (clash ? ' clash' : '');
+
+      const left = document.createElement('div');
+      left.innerHTML =
+        '<span class="result-tag">Sem ' + item.sem + ' · Sec ' + item.sec + '</span>' +
+        '<div class="course-line"><span class="course-name">' + item.course + '</span></div>' +
+        (item.teacher ? '<div class="course-line teacher">' + item.teacher + '</div>' : '') +
+        (item.room ? '<div class="course-line room">Room ' + item.room + '</div>' : '') +
+        '<div class="result-day">' + PERIODS[item.period] + '</div>';
+
+      const btn = document.createElement('button');
+      btn.className = 'add-btn remove';
+      btn.textContent = 'Remove';
+      btn.addEventListener('click', ()=> toggleAdd(item.id));
+
+      card.appendChild(left);
+      card.appendChild(btn);
+      block.appendChild(card);
+    });
+
+    mineContainer.appendChild(block);
+  });
+}
+</script>
+</body>
+</html>
